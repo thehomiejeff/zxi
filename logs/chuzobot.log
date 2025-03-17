@@ -1,0 +1,42 @@
+2025-03-17 03:20:19 - utils.database - INFO - Connected to SQLite database: data/fangen.db
+2025-03-17 03:20:19 - utils.database - INFO - Database tables set up successfully
+2025-03-17 03:20:19 - utils.database - INFO - Initial crafting recipes added successfully
+2025-03-17 03:20:19 - utils.fangen_lore_manager - INFO - Fangen lore loaded successfully from data/lore.txt
+2025-03-17 03:20:19 - __main__ - ERROR - Error in main: 'Updater' object has no attribute '_Updater__polling_cleanup_cb' and no __dict__ for setting new attributes
+Traceback (most recent call last):
+  File "/Users/luck/Desktop/projects/zxi/main.py", line 234, in main
+    application = Application.builder().token(BOT_TOKEN).build()
+  File "/Users/luck/Desktop/projects/zxi/venv/lib/python3.13/site-packages/telegram/ext/_applicationbuilder.py", line 312, in build
+    updater = Updater(bot=bot, update_queue=update_queue)
+  File "/Users/luck/Desktop/projects/zxi/venv/lib/python3.13/site-packages/telegram/ext/_updater.py", line 128, in __init__
+    self.__polling_cleanup_cb: Optional[Callable[[], Coroutine[Any, Any, None]]] = None
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Updater' object has no attribute '_Updater__polling_cleanup_cb' and no __dict__ for setting new attributes
+2025-03-17 03:27:56 - utils.database - INFO - Connected to SQLite database: data/fangen.db
+2025-03-17 03:27:56 - utils.database - INFO - Database tables set up successfully
+2025-03-17 03:27:56 - utils.database - INFO - Initial crafting recipes added successfully
+2025-03-17 03:27:56 - utils.fangen_lore_manager - INFO - Fangen lore loaded successfully from data/lore.txt
+2025-03-17 03:27:56 - __main__ - ERROR - Error in main: 'Updater' object has no attribute '_Updater__polling_cleanup_cb' and no __dict__ for setting new attributes
+Traceback (most recent call last):
+  File "/Users/luck/Desktop/projects/zxi/main.py", line 244, in main
+    application = Application.builder().token(BOT_TOKEN).post_init(post_init).build()
+  File "/Users/luck/Desktop/projects/zxi/venv/lib/python3.13/site-packages/telegram/ext/_applicationbuilder.py", line 312, in build
+    updater = Updater(bot=bot, update_queue=update_queue)
+  File "/Users/luck/Desktop/projects/zxi/venv/lib/python3.13/site-packages/telegram/ext/_updater.py", line 128, in __init__
+    self.__polling_cleanup_cb: Optional[Callable[[], Coroutine[Any, Any, None]]] = None
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Updater' object has no attribute '_Updater__polling_cleanup_cb' and no __dict__ for setting new attributes
+2025-03-17 03:28:49 - utils.database - INFO - Connected to SQLite database: data/fangen.db
+2025-03-17 03:28:49 - utils.database - INFO - Database tables set up successfully
+2025-03-17 03:28:49 - utils.database - INFO - Initial crafting recipes added successfully
+2025-03-17 03:28:49 - utils.fangen_lore_manager - INFO - Fangen lore loaded successfully from data/lore.txt
+2025-03-17 03:28:49 - __main__ - ERROR - Error in main: 'Updater' object has no attribute '_Updater__polling_cleanup_cb' and no __dict__ for setting new attributes
+Traceback (most recent call last):
+  File "/Users/luck/Desktop/projects/zxi/main.py", line 244, in main
+    application = Application.builder().token(BOT_TOKEN).post_init(post_init).build()
+  File "/Users/luck/Desktop/projects/zxi/venv/lib/python3.13/site-packages/telegram/ext/_applicationbuilder.py", line 312, in build
+    updater = Updater(bot=bot, update_queue=update_queue)
+  File "/Users/luck/Desktop/projects/zxi/venv/lib/python3.13/site-packages/telegram/ext/_updater.py", line 128, in __init__
+    self.__polling_cleanup_cb: Optional[Callable[[], Coroutine[Any, Any, None]]] = None
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Updater' object has no attribute '_Updater__polling_cleanup_cb' and no __dict__ for setting new attributes

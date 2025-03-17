@@ -53,14 +53,25 @@ class QuestManager:
         return all_quests
     
     def start_quest(self, user_id: int, quest_name: str) -> Tuple[bool, str, Dict]:
-        """Start a quest for a user."""
+        """Start a quest for a user.
+        
+        Initializes a new quest for the user if they are not already on one,
+        sets up the initial quest state, and returns the first scene.
+        
+        Args:
+            user_id: The user ID starting the quest
+            quest_name: The name of the quest to start
+            
+        Returns:
+            Tuple containing (success, message, scene_data)
+        """
         quest_info = self.lore_manager.get_quest_info(quest_name)
         if not quest_info:
             return False, f"Quest '{quest_name}' not found.", {}
         
         # Check if user is already on a quest
         if user_id in self.active_quests:
-            return False, "You are already on a quest. Use /abandonment to abandon your current quest.", {}
+            return False, "You are already on a quest. Use /abandonquest to abandon your current quest.", {}
         
         # Set up initial quest state
         quest_state = {
@@ -94,7 +105,18 @@ class QuestManager:
         return True, f"You have started the quest: {quest_name}", scene_data
     
     def make_choice(self, user_id: int, choice_id: str) -> Tuple[bool, str, Dict]:
-        """Process a user's choice in a quest."""
+        """Process a user's choice in a quest.
+        
+        Handles the user's decision in the current quest scene, updates quest state,
+        processes inventory changes, and determines the next scene.
+        
+        Args:
+            user_id: The user ID making the choice
+            choice_id: The ID of the choice selected
+            
+        Returns:
+            Tuple containing (success, message, scene_data)
+        """
         if user_id not in self.active_quests:
             return False, "You are not currently on a quest.", {}
         
@@ -230,7 +252,17 @@ class QuestManager:
         return True, f"You have abandoned the quest: {quest_name}"
     
     def get_current_quest(self, user_id: int) -> Tuple[bool, str, Dict]:
-        """Get the current quest state for a user."""
+        """Get the current quest state for a user.
+        
+        Retrieves the active quest information for a user, including
+        the current scene and available choices.
+        
+        Args:
+            user_id: The user ID to check for active quests
+            
+        Returns:
+            Tuple containing (success, message, scene_data)
+        """
         if user_id not in self.active_quests:
             return False, "You are not currently on a quest.", {}
         
@@ -255,7 +287,17 @@ class QuestManager:
         return True, f"Current quest: {quest_name} (Scene {current_scene_num})", scene_data
     
     def _format_scene_for_display(self, scene: Dict) -> Dict:
-        """Format a scene for display to the user."""
+        """Format a scene for display to the user.
+        
+        Converts the internal scene representation into a format suitable
+        for display to the user in the Telegram interface.
+        
+        Args:
+            scene: Dictionary containing scene data
+            
+        Returns:
+            Dictionary with formatted scene content for display
+        """
         # Build narrative text
         narrative = f"**Scene {scene['number']}: {scene['title']}**\n\n"
         

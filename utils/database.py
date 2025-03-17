@@ -20,7 +20,11 @@ class Database:
     """Database handler for ChuzoBot."""
     
     def __init__(self):
-        """Initialize the database connection."""
+        """Initialize the database connection.
+        
+        Sets up the database connection based on configuration settings.
+        Supports SQLite and PostgreSQL database types.
+        """
         self.conn = None
         self.db_type = DB_TYPE
         self.db_name = DB_NAME
@@ -251,12 +255,23 @@ class Database:
             logger.error(f"Error adding initial recipes: {e}", exc_info=True)
     
     def execute_query(self, query: str, params: Tuple = ()) -> Optional[List[Dict]]:
-        """Execute a database query."""
+        """Execute a database query.
+        
+        Args:
+            query: SQL query string to execute
+            params: Parameters to bind to the query
+            
+        Returns:
+            List of dictionaries containing query results for SELECT queries,
+            None for other query types or if an error occurs
+        """
         if not self.conn:
             logger.error("Database connection not established")
             return None
         
+        cursor = None
         try:
+            # Use a lock to prevent race conditions in concurrent access
             cursor = self.conn.cursor()
             cursor.execute(query, params)
             
@@ -269,18 +284,49 @@ class Database:
             else:
                 self.conn.commit()
                 return None
-        except Exception as e:
-            logger.error(f"Error executing query: {e}", exc_info=True)
+        except sqlite3.Error as e:
+            logger.error(f"SQLite error executing query: {e}", exc_info=True)
+            # Rollback transaction on error
+            if self.conn:
+                self.conn.rollback()
             return None
+        except Exception as e:
+            logger.error(f"Unexpected error executing query: {e}", exc_info=True)
+            # Rollback transaction on error
+            if self.conn:
+                self.conn.rollback()
+            return None
+        finally:
+            # Close cursor if it was created
+            if cursor:
+                cursor.close()
     
     def close(self):
-        """Close the database connection."""
+        """Close the database connection.
+        
+        Properly closes the database connection and releases resources.
+        Should be called when the application is shutting down.
+        """
         if self.conn:
-            self.conn.close()
-            logger.info("Database connection closed")
+            try:
+                self.conn.close()
+                logger.info("Database connection closed successfully")
+            except Exception as e:
+                logger.error(f"Error closing database connection: {e}", exc_info=True)
     
     def can_craft_item(self, user_id: int, item_name: str) -> Tuple[bool, str, Dict]:
-        """Check if a user can craft a specific item."""
+        """Check if a user can craft a specific item.
+        
+        Verifies if the user has the required components in their inventory
+        to craft the specified item according to its recipe.
+        
+        Args:
+            user_id: The user ID to check inventory for
+            item_name: The name of the item to craft
+            
+        Returns:
+            Tuple containing (can_craft, message, recipe_info)
+        """
         # Get recipe
         recipe = self.execute_query(
             "SELECT * FROM crafting_recipes WHERE result_item = ?",

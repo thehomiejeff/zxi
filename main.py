@@ -33,7 +33,15 @@ from handlers.quest_handlers import QuestCommandHandlers
 logger = setup_logger(__name__, LOG_LEVEL)
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Send a message when the command /start is issued."""
+    """Send a message when the command /start is issued.
+    
+    Welcomes the user to the bot, registers them in the database if they're new,
+    and presents the main menu options.
+    
+    Args:
+        update: The update containing the command
+        context: The context object for the bot
+    """
     user = update.effective_user
     logger.info(f"User {user.id} started the bot")
     
@@ -69,7 +77,18 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     )
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Send a message when the command /help is issued."""
+    """Send a message when the command /help is issued.
+    
+    Provides the user with a comprehensive list of available commands
+    and their descriptions.
+    
+    Args:
+        update: The update containing the command
+        context: The context object for the bot
+    """
+    user = update.effective_user
+    logger.info(f"User {user.id} requested help")
+    
     help_text = (
         "🌟 *ZXI: Your Guide to the World of Fangen* 🌟\n\n"
         "Here are the commands you can use:\n\n"
@@ -102,7 +121,15 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     await update.message.reply_text(help_text, parse_mode='Markdown')
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handle user messages."""
+    """Handle user messages.
+    
+    Processes incoming user messages, checking if they're for character interaction
+    or lore queries. Provides helpful responses based on message content.
+    
+    Args:
+        update: The update containing the message
+        context: The context object for the bot
+    """
     # First check if message is for character interaction
     quest_handlers = context.bot_data['quest_handlers']
     character_handled = await quest_handlers.handle_character_message(update, context)
@@ -146,6 +173,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                     )]]
                     reply_markup = InlineKeyboardMarkup(keyboard)
                     
+                    # Log the successful lore retrieval
+                    logger.info(f"User {user_id} retrieved lore entry: {entry_name}")
+                    
                     await update.message.reply_text(
                         f"I found this in the lore:\n\n*{entry_name}*\n\n{content_text}",
                         reply_markup=reply_markup,
@@ -155,7 +185,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         
         # Create response for multiple results
         response = f"I found {total_results} entries related to '{message}' in the lore. You can view them with:\n\n/search {message}"
-        await update.message.reply_text(response)
+        # Log multiple results found
+        logger.info(f"User {user_id} found {total_results} lore entries for query: {message}")
+        await update.message.reply_text(response, parse_mode='Markdown')
     else:
         # No direct lore matches, give a helpful response
         suggestions = [
@@ -169,13 +201,24 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         ]
         
         import random
+        # Log failed query attempt
+        logger.info(f"User {user_id} query not matched: {message}")
         await update.message.reply_text(
             f"I'm not sure how to respond to that. {random.choice(suggestions)}\n\n"
-            f"Use /help to see all available commands."
+            f"Use /help to see all available commands.",
+            parse_mode='Markdown'
         )
 
 async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handle callback queries from inline keyboards."""
+    """Handle callback queries from inline keyboards.
+    
+    Processes callback data from inline keyboards and routes to appropriate handlers
+    based on the callback prefix.
+    
+    Args:
+        update: The update containing the callback query
+        context: The context object for the bot
+    """
     query = update.callback_query
     
     # Get handlers

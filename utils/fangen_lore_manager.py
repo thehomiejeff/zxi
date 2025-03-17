@@ -69,9 +69,18 @@ class FangenLoreManager:
         self._parse_items_and_quests(content)
     
     def _parse_character_profiles(self, content: str) -> None:
-        """Parse character profiles from the content."""
-        # Look for character profile sections
-        character_pattern = r'([A-Z][A-Z, ]+)\n•\s*Backstory & Role:\s*(.*?)•\s*Personality & Motivations:\s*(.*?)•\s*Item & Quest Connections:'
+        """Parse character profiles from the content.
+        
+        Extracts character information including name, backstory, personality,
+        and their connections to items and quests.
+        
+        Args:
+            content: Raw lore text content to parse
+        """
+        # Look for character profile sections with more flexible pattern matching
+        # This improved pattern handles both uppercase and mixed case character names
+        # and accounts for variations in formatting
+        character_pattern = r'([A-Z][A-Za-z, ]+)\n•\s*Backstory\s*&?\s*Role:\s*(.*?)•\s*Personality\s*&?\s*Motivations:\s*(.*?)(?:•\s*Item\s*&?\s*Quest Connections:|•\s*Relationships:)'
         character_sections = re.findall(character_pattern, content, re.DOTALL)
         
         for name, backstory, personality in character_sections:
@@ -80,8 +89,15 @@ class FangenLoreManager:
             personality = personality.strip()
             
             # Extract item and quest connections if available
-            item_quest_pattern = r'•\s*Item & Quest Connections:(.*?)(?:_{10,}|$)'
-            item_quest_match = re.search(item_quest_pattern, content[content.find(name):], re.DOTALL)
+            # Improved pattern with more flexible matching for section headers
+            item_quest_pattern = r'•\s*Item\s*&?\s*Quest Connections:(.*?)(?:_{10,}|$)'
+            # Use a safer approach to find content after the character name
+            name_pos = content.find(name)
+            if name_pos >= 0:
+                search_content = content[name_pos:]
+                item_quest_match = re.search(item_quest_pattern, search_content, re.DOTALL)
+            else:
+                item_quest_match = None
             
             item_connections = ""
             quest_connections = ""
@@ -240,20 +256,32 @@ class FangenLoreManager:
                     }
     
     def _parse_quest_scenes(self, content: str, quest_title: str) -> List[Dict]:
-        """Parse quest scenes for a specific quest."""
+        """Parse quest scenes for a specific quest.
+        
+        Extracts scene information including settings, dialogues, and player choices
+        for a given quest from the lore content.
+        
+        Args:
+            content: Raw lore text content to parse
+            quest_title: Title of the quest to parse scenes for
+            
+        Returns:
+            List of dictionaries containing scene data
+        """
         scenes = []
         
-        # Find all scenes in this quest
-        scene_pattern = f'Quest: {re.escape(quest_title)}.*?Scene (\\d+): ([^\n]+)(.*?)(?:Scene \\d+:|Your Choice:|Epilogue|$)'
+        # Find all scenes in this quest with improved pattern matching
+        # This pattern is more robust to variations in formatting and handles scene transitions better
+        scene_pattern = f'Quest:\\s*{re.escape(quest_title)}.*?Scene\\s*(\\d+):\\s*([^\n]+)(.*?)(?:Scene\\s*\\d+:|Your\\s*Choice:|Epilogue:|$)'
         scene_matches = re.findall(scene_pattern, content, re.DOTALL)
         
         for scene_num, scene_title, scene_content in scene_matches:
-            # Parse scene setting
-            setting_pattern = r'Setting:(.*?)(?:[A-Z][a-z]+:|$)'
+            # Parse scene setting with improved pattern
+            setting_pattern = r'Setting:\s*(.*?)(?:[A-Z][a-z]+\s*:|$)'
             setting_match = re.search(setting_pattern, scene_content, re.DOTALL)
             setting = setting_match.group(1).strip() if setting_match else ""
             
-            # Parse NPC dialogues
+            # Parse NPC dialogues with improved pattern
             npc_dialogues = {}
             npc_pattern = r'([A-Za-z, ]+)(?:\(.*?\))?:\s*"([^"]+)"'
             npc_matches = re.findall(npc_pattern, scene_content, re.DOTALL)
@@ -261,9 +289,9 @@ class FangenLoreManager:
             for npc, dialogue in npc_matches:
                 npc_dialogues[npc.strip()] = dialogue.strip()
             
-            # Parse player choices
+            # Parse player choices with improved pattern
             choices = []
-            choice_pattern = r'•\s*Option\s*(\d+[A-Z]?):\s*([^\n]+)(?:\nPlayer: "([^"]+)")?\s*Outcome:(.*?)(?:•\s*Option\s*\d+[A-Z]?:|$)'
+            choice_pattern = r'•\s*Option\s*(\d+[A-Z]?):\s*([^\n]+)(?:\nPlayer:\s*"([^"]+)")?\s*Outcome:(.*?)(?:•\s*Option\s*\d+[A-Z]?:|$)'
             choice_matches = re.findall(choice_pattern, content, re.DOTALL)
             
             for choice_id, choice_desc, player_dialogue, outcome in choice_matches:

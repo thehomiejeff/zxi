@@ -25,6 +25,13 @@ ChuzoBot is a Telegram bot that brings the rich world of Fangen to life through 
 - **Character Backstories**: Learn about the motivations and histories of key figures
 - **Mystical Themes**: Explore the elemental duality, legacy, and transformation themes
 
+### 🔄 Recent Improvements
+- **Enhanced Error Handling**: Robust error handling with proper transaction management
+- **Improved Logging System**: Comprehensive logging with rotation and better formatting
+- **Optimized Lore Parsing**: More flexible regex patterns for better content extraction
+- **Better Documentation**: Detailed docstrings and improved code comments
+- **User Experience Enhancements**: Better error messages and Markdown formatting support
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -124,6 +131,7 @@ chuzobot/
 │   ├── logger.py           # Logging utility
 │   ├── fangen_lore_manager.py # Fangen-specific lore manager
 │   └── quest_manager.py    # Quest management utility
+└── logs/                   # Log files directory (auto-created)
 ```
 
 ## 🛠️ Development
